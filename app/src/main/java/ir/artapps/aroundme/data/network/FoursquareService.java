@@ -32,8 +32,8 @@ public class FoursquareService {
         return retrofit.create(FoursquareApi.class);
     }
 
-    public static void getVenues(String latitude, String longitude, Callback<SearchVenuesesResponseModel> callback){
-        String latlang = String.format("%s,%s" , latitude, longitude);
+    public static void getVenues(double latitude, double longitude, Callback<SearchVenuesesResponseModel> callback){
+        String latlang = String.format("%f,%f" , latitude, longitude);
         Call<SearchVenuesesResponseModel> call = createService().searchVenues(latlang, CLIENT_ID, CLIENT_SECRET, VERSION);
         call.enqueue(callback);
     }
