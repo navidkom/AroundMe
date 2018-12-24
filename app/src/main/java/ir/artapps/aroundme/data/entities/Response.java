@@ -12,16 +12,16 @@ public class Response {
 
     @SerializedName("venues")
     @Expose
-    private List<Venue> venues = null;
+    private List<VenueFoursquareEntity> venues = null;
     @SerializedName("confident")
     @Expose
     private Boolean confident;
 
-    public List<Venue> getVenues() {
+    public List<VenueFoursquareEntity> getVenues() {
         return venues;
     }
 
-    public void setVenues(List<Venue> venues) {
+    public void setVenues(List<VenueFoursquareEntity> venues) {
         this.venues = venues;
     }
 

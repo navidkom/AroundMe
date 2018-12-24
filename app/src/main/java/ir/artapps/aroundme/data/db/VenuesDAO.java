@@ -1,13 +1,12 @@
 package ir.artapps.aroundme.data.db;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 
 import java.util.List;
-
 import ir.artapps.aroundme.data.entities.Venue;
 
 /**
@@ -15,14 +14,18 @@ import ir.artapps.aroundme.data.entities.Venue;
  */
 
 @Dao
-interface  VenuesDAO {
+interface VenuesDAO {
 
     @Query("SELECT * FROM venue WHERE id = :query")
-    List<Venue> getVenueById(String query);
+    LiveData<List<Venue>> getVenueById(String query);
+
+    @Query("SELECT * FROM venue WHERE latitude between :latFrom AND :latTo AND longitude between :longFrom AND :longTo")
+    LiveData<List<Venue>> getVenueByLatlong( double latFrom, double latTo, double longFrom, double longTo );
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void saveAllVenues(List<Venue> venues);
+    void insertVenue(Venue venue);
 
-    @Query("DELETE FROM venue")
-    void clear();
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertVenue(List<Venue> venues);
+
 }

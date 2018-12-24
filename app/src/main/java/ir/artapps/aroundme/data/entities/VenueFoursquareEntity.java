@@ -1,30 +1,13 @@
-package ir.artapps.aroundme.data.entities;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.Index;
-import android.arch.persistence.room.PrimaryKey;
+package ir.artapps.aroundme.data.entities;
 
 import java.util.List;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import static ir.artapps.aroundme.data.entities.Venue.TABLE_NAME;
 
-
-@Entity(tableName = TABLE_NAME, indices = {@Index(value = {"id"},
-        unique = true)})
-public class Venue {
-
-    @Ignore
-    public static transient final String TABLE_NAME = "venue";
-
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "id_")
-    public transient long id_;
-
+public class VenueFoursquareEntity {
 
     @SerializedName("id")
     @Expose
@@ -36,31 +19,7 @@ public class Venue {
 
     @SerializedName("location")
     @Expose
-    private Location location;
-
-    @SerializedName("latitude")
-    @Expose
-    private double   latitude;
-
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
-
-    @SerializedName("longitude")
-    @Expose
-    private double   longitude;
+    private Location   location;
 
     @SerializedName("canonicalUrl")
     @Expose
@@ -113,6 +72,7 @@ public class Venue {
     @SerializedName("timeZone")
     @Expose
     private String timeZone;
+
 
     public String getId() {
 
@@ -242,5 +202,6 @@ public class Venue {
     public void setTimeZone(String timeZone) {
         this.timeZone = timeZone;
     }
+
 
 }

@@ -54,10 +54,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<SearchVenuesesResponseModel> call, Response<SearchVenuesesResponseModel> response) {
 
-                if (response != null) {
-                    MainRecyclerViewAdapter adapter = new MainRecyclerViewAdapter(response.body().getResponse().getVenues());
-                    recyclerView.setAdapter(adapter);
-                }
+//                if (response != null) {
+//                    MainRecyclerViewAdapter adapter = new MainRecyclerViewAdapter(response.body().getResponse().getVenues());
+//                    recyclerView.setAdapter(adapter);
+//                }
             }
 
             @Override
@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
                     // ...
 
                     FoursquareService.getVenues(location.getLatitude(), location.getLongitude(), callback);
-                    Toast.makeText(MainActivity.this , "", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "", Toast.LENGTH_SHORT).show();
                 }
             }
         };
@@ -101,31 +101,15 @@ public class MainActivity extends AppCompatActivity {
     private void startLocationUpdates() {
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
 
-            // Permission is not granted
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)) {
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-            } else {
-                // No explanation needed; request the permission
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+//                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+//            } else {
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         MY_PERMISSIONS_REQUEST_READ_CONTACTS);
 
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
-            }
+//            }
             return;
         }
 
