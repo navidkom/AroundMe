@@ -16,16 +16,9 @@ import ir.artapps.aroundme.data.entities.Venue;
 @Dao
 interface VenuesDAO {
 
-    @Query("SELECT * FROM venue WHERE id = :query")
-    LiveData<List<Venue>> getVenueById(String query);
-
     @Query("SELECT * FROM venue WHERE latitude between :latFrom AND :latTo AND longitude between :longFrom AND :longTo")
     LiveData<List<Venue>> getVenueByLatlong( double latFrom, double latTo, double longFrom, double longTo );
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertVenue(Venue venue);
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertVenue(List<Venue> venues);
-
 }
