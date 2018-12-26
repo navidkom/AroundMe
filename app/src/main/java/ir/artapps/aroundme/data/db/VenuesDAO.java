@@ -17,7 +17,7 @@ import ir.artapps.aroundme.data.entities.Venue;
 interface VenuesDAO {
 
     @Query("SELECT * FROM venue WHERE latitude between :latFrom AND :latTo AND longitude between :longFrom AND :longTo")
-    LiveData<List<Venue>> getVenueByLatlong( double latFrom, double latTo, double longFrom, double longTo );
+    List<Venue> getVenueByLatlong( double latFrom, double latTo, double longFrom, double longTo );
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertVenue(Venue venue);

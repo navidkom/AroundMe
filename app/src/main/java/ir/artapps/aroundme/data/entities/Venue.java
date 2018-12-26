@@ -5,21 +5,34 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
-
-import java.util.List;
+import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
 
 import static ir.artapps.aroundme.data.entities.Venue.TABLE_NAME;
 
 
 @Entity(tableName = TABLE_NAME, indices = {@Index(value = {"id"},
         unique = true)})
-public class Venue {
+public class Venue implements Comparable<Venue> {
 
     @Ignore
     public static transient final String TABLE_NAME = "venue";
+
+    public double getDistance() {
+        return distance;
+    }
+
+    public void setDistance(double distance) {
+        this.distance = distance;
+    }
+
+
+    @Ignore
+    private double distance = 0;
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id_")
@@ -28,11 +41,11 @@ public class Venue {
 
     @SerializedName("id")
     @Expose
-    private String     id;
+    private String id;
 
     @SerializedName("name")
     @Expose
-    private String     name;
+    private String name;
 
     @SerializedName("location")
     @Expose
@@ -40,7 +53,7 @@ public class Venue {
 
     @SerializedName("latitude")
     @Expose
-    private double   latitude;
+    private double latitude;
 
     public double getLatitude() {
         return latitude;
@@ -60,11 +73,35 @@ public class Venue {
 
     @SerializedName("longitude")
     @Expose
-    private double   longitude;
+    private double longitude;
+
+    @SerializedName("icon")
+    @Expose
+    private String icon;
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public String getIconPrefix() {
+        return iconPrefix;
+    }
+
+    public void setIconPrefix(String iconPrefix) {
+        this.iconPrefix = iconPrefix;
+    }
+
+    @SerializedName("iconPrefix")
+    @Expose
+    private String iconPrefix;
 
     @SerializedName("canonicalUrl")
     @Expose
-    private String     canonicalUrl;
+    private String canonicalUrl;
 
     @SerializedName("contact")
     @Expose
@@ -243,4 +280,8 @@ public class Venue {
         this.timeZone = timeZone;
     }
 
+    @Override
+    public int compareTo(@NonNull Venue o) {
+        return Double.compare(distance , o.distance);
+    }
 }

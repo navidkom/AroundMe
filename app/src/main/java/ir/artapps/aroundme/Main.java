@@ -11,14 +11,10 @@ import ir.artapps.aroundme.data.network.FoursquareApi;
  */
 public class Main extends Application {
 
-    public FoursquareApi foursquareApi;
-
     @Override
     public void onCreate() {
         super.onCreate();
 
-//        AppDatabase db = Room.databaseBuilder(getApplicationContext(),
-//                AppDatabase.class, "database-name").build();
 
     }
 }

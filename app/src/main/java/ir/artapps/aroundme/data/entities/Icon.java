@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class Icon {
 
-    private final static int SIZE = 100;
+    private final static int SIZE = 64;
 
     @SerializedName("prefix")
     @Expose
