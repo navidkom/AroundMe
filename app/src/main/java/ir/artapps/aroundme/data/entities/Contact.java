@@ -1,10 +1,13 @@
 
 package ir.artapps.aroundme.data.entities;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Contact {
+public class Contact implements Parcelable {
 
     @SerializedName("twitter")
     @Expose
@@ -62,4 +65,41 @@ public class Contact {
         this.facebookName = facebookName;
     }
 
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.twitter);
+        dest.writeString(this.instagram);
+        dest.writeString(this.facebook);
+        dest.writeString(this.facebookUsername);
+        dest.writeString(this.facebookName);
+    }
+
+    public Contact() {
+    }
+
+    protected Contact(Parcel in) {
+        this.twitter = in.readString();
+        this.instagram = in.readString();
+        this.facebook = in.readString();
+        this.facebookUsername = in.readString();
+        this.facebookName = in.readString();
+    }
+
+    public static final Parcelable.Creator<Contact> CREATOR = new Parcelable.Creator<Contact>() {
+        @Override
+        public Contact createFromParcel(Parcel source) {
+            return new Contact(source);
+        }
+
+        @Override
+        public Contact[] newArray(int size) {
+            return new Contact[size];
+        }
+    };
 }

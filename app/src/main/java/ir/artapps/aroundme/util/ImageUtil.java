@@ -4,27 +4,26 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.ImageView;
 
 import java.io.InputStream;
 
-import ir.artapps.aroundme.GenericCallback;
-
 public class ImageUtil {
 
-    public static void setImage(String url, GenericCallback<Bitmap> callback){
+    public static void setImage(String url, ImageView imageView){
         Bitmap bmp = BitmapMemCache.getBitmapFromMemCache(url);
         if(bmp != null) {
-            callback.response(bmp);
+            imageView.setImageBitmap(bmp);
         } else {
-            new DownloadImageTask(callback).execute(url);
+            new DownloadImageTask(imageView).execute(url);
         }
     }
 
     private static class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 
-        GenericCallback<Bitmap> callback;
-        public DownloadImageTask(GenericCallback<Bitmap> callback) {
-            this.callback = callback;
+        ImageView imageView;
+        public DownloadImageTask(ImageView imageView) {
+            this.imageView = imageView;
         }
 
         protected Bitmap doInBackground(String... urls) {
@@ -42,7 +41,7 @@ public class ImageUtil {
             return bmp;
         }
         protected void onPostExecute(Bitmap result) {
-            callback.response(result);
+            imageView.setImageBitmap(result);
         }
     }
 }

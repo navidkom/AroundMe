@@ -26,7 +26,7 @@ public class PermissionUtil {
 
     public static boolean isLocationPermissionAllow(Context context) {
 
-        return isPermissionAllow(context, Manifest.permission.ACCESS_FINE_LOCATION);
+        return (isPermissionAllow(context, Manifest.permission.ACCESS_FINE_LOCATION) && isPermissionAllow(context, Manifest.permission.ACCESS_COARSE_LOCATION));
     }
 
     public static void showLocationPermissionDialog(Activity activity, int requestCode) {

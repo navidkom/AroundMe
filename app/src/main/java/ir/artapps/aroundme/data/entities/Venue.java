@@ -5,11 +5,14 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static ir.artapps.aroundme.data.entities.Venue.TABLE_NAME;
@@ -17,7 +20,7 @@ import static ir.artapps.aroundme.data.entities.Venue.TABLE_NAME;
 
 @Entity(tableName = TABLE_NAME, indices = {@Index(value = {"id"},
         unique = true)})
-public class Venue implements Comparable<Venue> {
+public class Venue implements Comparable<Venue>,Parcelable {
 
     @Ignore
     public static transient final String TABLE_NAME = "venue";
@@ -284,4 +287,75 @@ public class Venue implements Comparable<Venue> {
     public int compareTo(@NonNull Venue o) {
         return Double.compare(distance , o.distance);
     }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeDouble(this.distance);
+        dest.writeString(this.id);
+        dest.writeString(this.name);
+        dest.writeParcelable(this.location, flags);
+        dest.writeDouble(this.latitude);
+        dest.writeDouble(this.longitude);
+        dest.writeString(this.icon);
+        dest.writeString(this.iconPrefix);
+        dest.writeString(this.canonicalUrl);
+        dest.writeParcelable(this.contact, flags);
+        dest.writeList(this.categories);
+        dest.writeValue(this.verified);
+        dest.writeString(this.url);
+        dest.writeValue(this.dislike);
+        dest.writeValue(this.ok);
+        dest.writeValue(this.rating);
+        dest.writeString(this.ratingColor);
+        dest.writeValue(this.ratingSignals);
+        dest.writeValue(this.createdAt);
+        dest.writeString(this.shortUrl);
+        dest.writeString(this.timeZone);
+    }
+
+    public Venue() {
+    }
+
+    protected Venue(Parcel in) {
+        this.distance = in.readDouble();
+        this.id = in.readString();
+        this.name = in.readString();
+        this.location = in.readParcelable(Location.class.getClassLoader());
+        this.latitude = in.readDouble();
+        this.longitude = in.readDouble();
+        this.icon = in.readString();
+        this.iconPrefix = in.readString();
+        this.canonicalUrl = in.readString();
+        this.contact = in.readParcelable(Contact.class.getClassLoader());
+        this.categories = new ArrayList<Category>();
+        in.readList(this.categories, Category.class.getClassLoader());
+        this.verified = (Boolean) in.readValue(Boolean.class.getClassLoader());
+        this.url = in.readString();
+        this.dislike = (Boolean) in.readValue(Boolean.class.getClassLoader());
+        this.ok = (Boolean) in.readValue(Boolean.class.getClassLoader());
+        this.rating = (Double) in.readValue(Double.class.getClassLoader());
+        this.ratingColor = in.readString();
+        this.ratingSignals = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.createdAt = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.shortUrl = in.readString();
+        this.timeZone = in.readString();
+    }
+
+    public static final Parcelable.Creator<Venue> CREATOR = new Parcelable.Creator<Venue>() {
+        @Override
+        public Venue createFromParcel(Parcel source) {
+            return new Venue(source);
+        }
+
+        @Override
+        public Venue[] newArray(int size) {
+            return new Venue[size];
+        }
+    };
 }

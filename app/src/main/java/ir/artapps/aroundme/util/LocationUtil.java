@@ -1,6 +1,7 @@
 package ir.artapps.aroundme.util;
 
 import android.Manifest;
+import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -12,22 +13,16 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
-import java.util.List;
-
-import ir.artapps.aroundme.GenericCallback;
-import ir.artapps.aroundme.data.entities.Venue;
-
 public class LocationUtil {
-
-    private static LocationUtil instance;
 
     private LocationCallback mLocationCallback;
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationRequest mLocationRequest;
     private Location preLocation;
     private Context context;
+    private double LOCATION_UPDATE_MIM_DISTANCE = 0;
 
-    public LocationUtil(final Context context, final GenericCallback<Location> callback) {
+    public LocationUtil(final Context context, final MutableLiveData<Location> locationLiveData) {
 
         this.context = context;
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
@@ -46,13 +41,13 @@ public class LocationUtil {
                     // Update UI with location data
                     // ...
 
-                    if (preLocation != null && DistanceUtil.distance(preLocation.getLatitude(), location.getLatitude(), preLocation.getLongitude(), location.getLongitude()) < 300) {
+                    if (preLocation != null && DistanceUtil.distance(preLocation.getLatitude(), location.getLatitude(), preLocation.getLongitude(), location.getLongitude()) < LOCATION_UPDATE_MIM_DISTANCE) {
                         return;
                     }
 
                     preLocation = location;
 
-                    callback.response(location);
+                    locationLiveData.setValue(location);
 
                 }
             }
@@ -60,12 +55,16 @@ public class LocationUtil {
     }
 
     public void startLocationUpdates() {
+
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-
         mFusedLocationClient.requestLocationUpdates(mLocationRequest,
                 mLocationCallback,
                 null);
+    }
+
+    public void removeLocationListener() {
+        mFusedLocationClient.removeLocationUpdates(mLocationCallback);
     }
 }

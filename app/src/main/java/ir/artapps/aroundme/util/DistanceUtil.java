@@ -1,5 +1,8 @@
 package ir.artapps.aroundme.util;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
 public class DistanceUtil {
     public static double distance(double lat1, double lat2, double lon1,
                                   double lon2) {
@@ -18,5 +21,10 @@ public class DistanceUtil {
         distance = Math.pow(distance, 2) ;
 
         return Math.sqrt(distance);
+    }
+
+    public static String distanceToString(double distance){
+        NumberFormat nf = new DecimalFormat("###");
+        return String.format("%s m", nf.format(distance));
     }
 }

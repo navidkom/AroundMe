@@ -1,12 +1,12 @@
 package ir.artapps.aroundme.data;
 
 import android.app.Application;
+import android.arch.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import ir.artapps.aroundme.GenericCallback;
 import ir.artapps.aroundme.data.db.VenueRepository;
 import ir.artapps.aroundme.data.entities.Venue;
 import ir.artapps.aroundme.data.entities.VenueFoursquareEntity;
@@ -29,11 +29,11 @@ public class VenueManager {
         return instance;
     }
 
-    public void getVenuesAroundMe(final Application application, final double lat, final double lang, final boolean hasNetwork, boolean localOnly, final GenericCallback<List<Venue>> callback) {
+    public void getVenuesAroundMe(final Application application, final double lat, final double lang, final boolean hasNetwork, boolean localOnly, final MutableLiveData<List<Venue>> data) {
 
         // get locally cached venues
         if (!hasNetwork || localOnly) {
-            VenueRepository.getInstance(application).getAllVenuesAroundMe(lat, lang, callback);
+            VenueRepository.getInstance(application).getAllVenuesAroundMe(lat, lang, data);
             return;
         }
 
@@ -54,16 +54,17 @@ public class VenueManager {
                         }
 
                         Collections.sort(venueList);
-                        callback.response(venueList);
+//                        data.response(venueList);
+                        data.setValue(venueList);
                     }
                 } else {
-                    getVenuesAroundMe(application, lat, lang,hasNetwork,true, callback);
+                    getVenuesAroundMe(application, lat, lang,hasNetwork,true, data);
                 }
             }
 
             @Override
             public void onFailure(Call<SearchVenuesesResponseModel> call, Throwable t) {
-                getVenuesAroundMe(application, lat, lang,hasNetwork,true, callback);
+                getVenuesAroundMe(application, lat, lang,hasNetwork,true, data);
             }
         });
 

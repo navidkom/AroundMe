@@ -1,14 +1,12 @@
 package ir.artapps.aroundme.data.db;
 
 import android.app.Application;
+import android.arch.lifecycle.MutableLiveData;
 import android.os.AsyncTask;
 
-import java.lang.reflect.Array;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-import ir.artapps.aroundme.GenericCallback;
 import ir.artapps.aroundme.data.entities.Venue;
 import ir.artapps.aroundme.util.DistanceUtil;
 
@@ -31,8 +29,8 @@ public class VenueRepository {
         venuesDAO = db.getVenuesDAO();
     }
 
-    public void getAllVenuesAroundMe(double lat, double lang, GenericCallback<List<Venue>> callback) {
-        new getAllVenuesAroundMeAsyncTask(venuesDAO, lat, lang, callback).execute();
+    public void getAllVenuesAroundMe(double lat, double lang, MutableLiveData<List<Venue>> data) {
+        new getAllVenuesAroundMeAsyncTask(venuesDAO, lat, lang, data).execute();
     }
 
     public void insert(Venue venue) {
@@ -59,15 +57,15 @@ public class VenueRepository {
         private VenuesDAO mAsyncTaskDao;
         private double lat;
         private double lang;
-        private GenericCallback<List<Venue>> callback;
+        private MutableLiveData<List<Venue>> data;
 
         private final double radious = 0.1;
 
-        getAllVenuesAroundMeAsyncTask(VenuesDAO dao, double lat, double lang, GenericCallback<List<Venue>> callback) {
+        getAllVenuesAroundMeAsyncTask(VenuesDAO dao, double lat, double lang, MutableLiveData<List<Venue>> data) {
             this.mAsyncTaskDao = dao;
             this.lat = lat;
             this.lang = lang;
-            this.callback = callback;
+            this.data = data;
         }
 
         @Override
@@ -86,7 +84,7 @@ public class VenueRepository {
 
         @Override
         protected void onPostExecute(List<Venue> venues) {
-            callback.response(venues);
+            data.setValue(venues);
         }
     }
 

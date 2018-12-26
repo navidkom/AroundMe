@@ -1,9 +1,7 @@
 package ir.artapps.aroundme.data.network;
 
-import io.reactivex.Observable;
 import retrofit2.Call;
 import retrofit2.http.GET;
-import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 /**
@@ -20,7 +18,7 @@ public interface FoursquareApi {
     @GET("venues/search")
     Call<SearchVenuesesResponseModel> searchVenues(@Query(LATLANG_KEY) String latlang, @Query(CLIENT_ID_KEY) String clientId, @Query(SECRET_KEY) String secret, @Query(VERSION_KEY) String version);
 
-    @GET("venues/{" + VEN_ID_KEY + "}")
-    Observable getVenue(@Path(VEN_ID_KEY) String latitude, @Query(CLIENT_ID_KEY) String clientId, @Query(SECRET_KEY) String secret, @Query(VERSION_KEY) String version);
+//    @GET("venues/{" + VEN_ID_KEY + "}")
+//    Observable getVenue(@Path(VEN_ID_KEY) String latitude, @Query(CLIENT_ID_KEY) String clientId, @Query(SECRET_KEY) String secret, @Query(VERSION_KEY) String version);
 
 }
