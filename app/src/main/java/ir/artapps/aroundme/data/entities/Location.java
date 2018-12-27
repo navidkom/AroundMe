@@ -166,8 +166,6 @@ public class Location implements Parcelable {
         dest.writeStringList(this.formattedAddress);
     }
 
-    public Location() {
-    }
 
     protected Location(Parcel in) {
         this.address = in.readString();

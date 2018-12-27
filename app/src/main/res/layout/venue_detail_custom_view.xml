@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/view_default_padding_x2"
+    android:layout_marginLeft="@dimen/view_default_padding_x2"
+    android:layout_marginTop="@dimen/view_default_padding"
+    android:layout_marginEnd="@dimen/view_default_padding_x2"
+    android:layout_marginRight="@dimen/view_default_padding_x2"
+    android:layout_marginBottom="@dimen/view_default_padding"
+    android:background="@drawable/venue_recycler_selector_back"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:minHeight="40dp"
+    android:padding="@dimen/view_default_padding_x2">
+
+    <ImageView
+        android:id="@+id/venue_detail_custom_view_image_view"
+        android:layout_width="24dp"
+        android:layout_height="42dp"
+        android:layout_margin="@dimen/view_default_padding_x2"
+        android:textColor="@color/colorWhite" />
+
+    <TextView
+        android:id="@+id/venue_detail_custom_view_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/view_default_padding_x2"
+        android:textColor="@color/colorWhite" />
+
+</LinearLayout>

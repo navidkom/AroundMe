@@ -4,9 +4,6 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-
 public class GeneralUtils {
 
     public static boolean isNetworkAvailable(Context context) {

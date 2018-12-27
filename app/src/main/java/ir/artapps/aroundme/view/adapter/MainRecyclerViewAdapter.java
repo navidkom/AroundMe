@@ -1,4 +1,4 @@
-package ir.artapps.aroundme.view;
+package ir.artapps.aroundme.view.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -7,8 +7,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.List;
 
 import ir.artapps.aroundme.R;
@@ -16,10 +14,12 @@ import ir.artapps.aroundme.data.entities.Venue;
 import ir.artapps.aroundme.util.DistanceUtil;
 import ir.artapps.aroundme.util.ImageUtil;
 
+/**
+ * Created by navid on 28,December,2018
+ */
 public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerViewAdapter.VenueRecyclerViewViewHolder> {
-    private List<Venue> items;
+    private List<Venue>         items;
     private OnItemClickListener mItemClickListener;
-
 
     public MainRecyclerViewAdapter(List<Venue> items) {
         this.items = items;
@@ -35,11 +35,10 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
     public void onBindViewHolder(final VenueRecyclerViewViewHolder holder, int position) {
 
         Venue model = items.get(position);
-
         holder.name.setText(model.getName());
         holder.distance.setText(DistanceUtil.distanceToString(model.getDistance()));
         holder.imageView.setImageBitmap(null);
-        ImageUtil.setImage(model.getIcon(), holder.imageView );
+        ImageUtil.setImage(model.getIcon(), holder.imageView);
     }
 
     @Override
@@ -47,10 +46,18 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
         return items.size();
     }
 
+    public void setOnItemClickListener(final OnItemClickListener mItemClickListener) {
+        this.mItemClickListener = mItemClickListener;
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(View view, int position);
+    }
+
     public class VenueRecyclerViewViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        public TextView name;
-        public TextView distance;
+        public TextView  name;
+        public TextView  distance;
         public ImageView imageView;
 
         public VenueRecyclerViewViewHolder(View v) {
@@ -64,17 +71,9 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
 
         @Override
         public void onClick(View v) {
-            if(mItemClickListener != null) {
+            if (mItemClickListener != null) {
                 mItemClickListener.onItemClick(v, getAdapterPosition());
             }
         }
-    }
-
-    public interface OnItemClickListener {
-        void onItemClick(View view, int position);
-    }
-
-    public void setOnItemClickListener(final OnItemClickListener mItemClickListener) {
-        this.mItemClickListener = mItemClickListener;
     }
 }

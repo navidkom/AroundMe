@@ -9,6 +9,12 @@ import com.google.gson.annotations.SerializedName;
 
 public class Contact implements Parcelable {
 
+    @SerializedName("phone")
+    @Expose
+    private String phone;
+    @SerializedName("formattedPhone")
+    @Expose
+    private String formattedPhone;
     @SerializedName("twitter")
     @Expose
     private String twitter;
@@ -57,6 +63,22 @@ public class Contact implements Parcelable {
         this.facebookUsername = facebookUsername;
     }
 
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getFormattedPhone() {
+        return formattedPhone;
+    }
+
+    public void setFormattedPhone(String formattedPhone) {
+        this.formattedPhone = formattedPhone;
+    }
+
     public String getFacebookName() {
         return facebookName;
     }
@@ -73,7 +95,10 @@ public class Contact implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+
         dest.writeString(this.twitter);
+        dest.writeString(this.phone);
+        dest.writeString(this.formattedPhone);
         dest.writeString(this.instagram);
         dest.writeString(this.facebook);
         dest.writeString(this.facebookUsername);
@@ -84,6 +109,8 @@ public class Contact implements Parcelable {
     }
 
     protected Contact(Parcel in) {
+        this.phone = in.readString();
+        this.formattedPhone = in.readString();
         this.twitter = in.readString();
         this.instagram = in.readString();
         this.facebook = in.readString();

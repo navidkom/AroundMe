@@ -10,20 +10,39 @@ import java.io.InputStream;
 
 public class ImageUtil {
 
-    public static void setImage(String url, ImageView imageView){
+    public static void setImage(String url, ImageView imageView) {
         Bitmap bmp = BitmapMemCache.getBitmapFromMemCache(url);
-        if(bmp != null) {
+        if (bmp != null) {
             imageView.setImageBitmap(bmp);
         } else {
             new DownloadImageTask(imageView).execute(url);
         }
     }
 
+    public static void setImage(String url, ImageCallback callback) {
+        Bitmap bmp = BitmapMemCache.getBitmapFromMemCache(url);
+        if (bmp != null) {
+            callback.bitmapIsReady(bmp);
+        } else {
+            new DownloadImageTask(callback).execute(url);
+        }
+    }
+
+    public interface ImageCallback {
+        void bitmapIsReady(Bitmap bitmap);
+    }
+
     private static class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 
-        ImageView imageView;
+        ImageView imageView = null;
+        ImageCallback callback = null;
+
         public DownloadImageTask(ImageView imageView) {
             this.imageView = imageView;
+        }
+
+        public DownloadImageTask(ImageCallback callback) {
+            this.callback = callback;
         }
 
         protected Bitmap doInBackground(String... urls) {
@@ -40,8 +59,15 @@ public class ImageUtil {
             BitmapMemCache.addBitmapToMemCache(urldisplay, bmp);
             return bmp;
         }
+
         protected void onPostExecute(Bitmap result) {
-            imageView.setImageBitmap(result);
+            if(imageView != null) {
+                imageView.setImageBitmap(result);
+            }
+
+            if(callback != null) {
+                callback.bitmapIsReady(result);
+            }
         }
     }
 }

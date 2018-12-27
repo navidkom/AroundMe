@@ -59,7 +59,7 @@ public class VenueRepository {
         private double lang;
         private MutableLiveData<List<Venue>> data;
 
-        private final double radious = 0.1;
+        private final double radios = 0.01;  // radios about 1500 meters
 
         getAllVenuesAroundMeAsyncTask(VenuesDAO dao, double lat, double lang, MutableLiveData<List<Venue>> data) {
             this.mAsyncTaskDao = dao;
@@ -71,7 +71,7 @@ public class VenueRepository {
         @Override
         protected List<Venue> doInBackground(final Void... params) {
 
-            List<Venue> venues = mAsyncTaskDao.getVenueByLatlong(lat - radious, lat + radious, lang - radious, lang + radious);
+            List<Venue> venues = mAsyncTaskDao.getVenueByLatlong(lat - radios, lat + radios, lang - radios, lang + radios);
 
             for (Venue venue : venues) {
                 venue.setDistance(DistanceUtil.distance(venue.getLatitude(), lat, venue.getLongitude(), lang));

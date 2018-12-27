@@ -73,6 +73,17 @@ public class VenueFoursquareEntity {
     @Expose
     private String timeZone;
 
+    @SerializedName("bestPhoto")
+    @Expose
+    private PhotoItem bestPhoto;
+
+    public PhotoItem getBestPhoto() {
+        return bestPhoto;
+    }
+
+    public void setBestPhoto(PhotoItem bestPhoto) {
+        this.bestPhoto = bestPhoto;
+    }
 
     public String getId() {
 

@@ -8,11 +8,12 @@ import java.util.Collections;
 import java.util.List;
 
 import ir.artapps.aroundme.data.db.VenueRepository;
+import ir.artapps.aroundme.data.entities.GetVenueResponseModel;
+import ir.artapps.aroundme.data.entities.SearchVenuesesResponseModel;
 import ir.artapps.aroundme.data.entities.Venue;
 import ir.artapps.aroundme.data.entities.VenueFoursquareEntity;
 import ir.artapps.aroundme.data.mapper.VenueMapper;
 import ir.artapps.aroundme.data.network.FoursquareService;
-import ir.artapps.aroundme.data.network.SearchVenuesesResponseModel;
 import ir.artapps.aroundme.util.DistanceUtil;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -48,25 +49,43 @@ public class VenueManager {
                         List<Venue> venueList = new ArrayList<>();
                         for (VenueFoursquareEntity venue : response.body().getResponse().getVenues()) {
                             Venue tempVenue = VenueMapper.VenueForsquareToVenue(venue);
-                            tempVenue.setDistance(DistanceUtil.distance( tempVenue.getLatitude(), lat, tempVenue.getLongitude(), lang ));
+                            tempVenue.setDistance(DistanceUtil.distance(tempVenue.getLatitude(), lat, tempVenue.getLongitude(), lang));
                             VenueRepository.getInstance(application).insert(tempVenue);
                             venueList.add(tempVenue);
                         }
 
                         Collections.sort(venueList);
-//                        data.response(venueList);
                         data.setValue(venueList);
                     }
                 } else {
-                    getVenuesAroundMe(application, lat, lang,hasNetwork,true, data);
+                    getVenuesAroundMe(application, lat, lang, hasNetwork, true, data);
                 }
             }
 
             @Override
             public void onFailure(Call<SearchVenuesesResponseModel> call, Throwable t) {
-                getVenuesAroundMe(application, lat, lang,hasNetwork,true, data);
+                getVenuesAroundMe(application, lat, lang, hasNetwork, true, data);
             }
         });
+    }
 
+    public void getVenueDetail( String venueId, final MutableLiveData<VenueFoursquareEntity> data) {
+
+        FoursquareService.getVenueDetail(venueId, new Callback<GetVenueResponseModel>() {
+            @Override
+            public void onResponse(Call<GetVenueResponseModel> call, Response<GetVenueResponseModel> response) {
+
+                if (response != null && response.code() == 200) {
+                    if (response.body() != null && response.body().getResponse() != null && response.body().getResponse().getVenue() != null) {
+                        data.setValue(response.body().getResponse().getVenue());
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GetVenueResponseModel> call, Throwable t) {
+
+            }
+        });
     }
 }

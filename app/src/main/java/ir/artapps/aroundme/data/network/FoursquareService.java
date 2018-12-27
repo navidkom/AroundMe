@@ -1,5 +1,7 @@
 package ir.artapps.aroundme.data.network;
 
+import ir.artapps.aroundme.data.entities.GetVenueResponseModel;
+import ir.artapps.aroundme.data.entities.SearchVenuesesResponseModel;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
@@ -35,6 +37,11 @@ public class FoursquareService {
     public static void getVenues(double latitude, double longitude, Callback<SearchVenuesesResponseModel> callback){
         String latlang = String.format("%f,%f" , latitude, longitude);
         Call<SearchVenuesesResponseModel> call = createService().searchVenues(latlang, CLIENT_ID, CLIENT_SECRET, VERSION);
+        call.enqueue(callback);
+    }
+
+    public static void getVenueDetail(String venueId, Callback<GetVenueResponseModel> callback){
+        Call<GetVenueResponseModel> call = createService().getVenue(venueId, CLIENT_ID, CLIENT_SECRET, VERSION);
         call.enqueue(callback);
     }
 }

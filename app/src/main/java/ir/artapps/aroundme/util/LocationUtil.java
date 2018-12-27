@@ -19,8 +19,9 @@ public class LocationUtil {
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationRequest mLocationRequest;
     private Location preLocation;
+    private Location lastLocation;
     private Context context;
-    private double LOCATION_UPDATE_MIM_DISTANCE = 0;
+    private double LOCATION_UPDATE_MIM_DISTANCE = 20;
 
     public LocationUtil(final Context context, final MutableLiveData<Location> locationLiveData) {
 
@@ -40,6 +41,7 @@ public class LocationUtil {
                 for (Location location : locationResult.getLocations()) {
                     // Update UI with location data
                     // ...
+                    lastLocation = location;
 
                     if (preLocation != null && DistanceUtil.distance(preLocation.getLatitude(), location.getLatitude(), preLocation.getLongitude(), location.getLongitude()) < LOCATION_UPDATE_MIM_DISTANCE) {
                         return;
@@ -52,6 +54,11 @@ public class LocationUtil {
                 }
             }
         };
+    }
+
+    public Location getLastLocation(){
+        preLocation = lastLocation;
+        return lastLocation;
     }
 
     public void startLocationUpdates() {
