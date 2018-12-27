@@ -60,6 +60,13 @@ public class VenueDetailFragment extends BaseDialogFragment implements OnMapRead
         super.onCreate(savedInstanceState);
     }
 
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View mainView = inflater.inflate(R.layout.fragment_venue_detail, container, false);
+        return mainView;
+    }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -79,13 +86,6 @@ public class VenueDetailFragment extends BaseDialogFragment implements OnMapRead
         mutableLiveData.observe(this, this);
 
         VenueManager.getInstance().getVenueDetail(venue.getId(), mutableLiveData);
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View mainView = inflater.inflate(R.layout.fragment_venue_detail, container, false);
-        return mainView;
     }
 
     @Override
@@ -201,7 +201,6 @@ public class VenueDetailFragment extends BaseDialogFragment implements OnMapRead
     @Override
     public void onChanged(@Nullable VenueFoursquareEntity venueFoursquareEntity) {
         if (venueFoursquareEntity.getBestPhoto() != null && venueFoursquareEntity.getBestPhoto().getImageUrl() != null) {
-
             ImageUtil.setImage(venueFoursquareEntity.getBestPhoto().getImageUrl(), new ImageUtil.ImageCallback() {
                 @Override
                 public void bitmapIsReady(Bitmap bitmap) {
