@@ -29,6 +29,7 @@ import ir.artapps.aroundme.data.VenueManager;
 import ir.artapps.aroundme.data.entities.Category;
 import ir.artapps.aroundme.data.entities.Venue;
 import ir.artapps.aroundme.data.entities.VenueFoursquareEntity;
+import ir.artapps.aroundme.data.mapper.VenueMapper;
 import ir.artapps.aroundme.util.ImageUtil;
 import ir.artapps.aroundme.view.customview.VenueDetailCustomView;
 
@@ -77,7 +78,7 @@ public class VenueDetailFragment extends BaseDialogFragment implements OnMapRead
 
         initToolbar();
         initViews(view);
-        setData();
+        setPassedData(venue);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getFragmentManager().findFragmentById(R.id.fragment_venue_detail_map_fragment);
         mapFragment.getMapAsync(this);
@@ -136,10 +137,10 @@ public class VenueDetailFragment extends BaseDialogFragment implements OnMapRead
         appBarLayout.setExpanded(false);
     }
 
-    private void setData() {
+    private void setPassedData(Venue venue) {
 
         final String ltrChar = "\u200e";
-        final String nlChar  = "\n";
+        final String nlChar = "\n";
         final String virChar = ", ";
 
         if (venue.getCategories() != null && venue.getCategories().size() > 0) {
@@ -155,10 +156,6 @@ public class VenueDetailFragment extends BaseDialogFragment implements OnMapRead
                 categoryBuilder.deleteCharAt(categoryBuilder.length() - 1);
             }
             addViewToMainView(categoryBuilder.toString(), R.drawable.ic_label_24);
-        }
-
-        if (venue.getRating() != null) {
-            addViewToMainView(venue.getRating().toString(), R.drawable.ic_star_24);
         }
 
         if (venue.getLocation() != null) {
@@ -187,10 +184,27 @@ public class VenueDetailFragment extends BaseDialogFragment implements OnMapRead
             }
         }
 
+    }
+
+    private void setNetData(Venue venue) {
+
+        final String ltrChar = "\u200e";
+        final String nlChar = "\n";
+        final String virChar = ", ";
+
+
         if (venue.getContact() != null) {
             if (venue.getContact().getFormattedPhone() != null) {
                 addViewToMainView(venue.getContact().getFormattedPhone(), R.drawable.ic_phone_24);
             }
+        }
+
+        if (venue.getRating() != null) {
+            addViewToMainView(venue.getRating().toString(), R.drawable.ic_star_24);
+        }
+
+        if (venue.getShortUrl() != null) {
+            addViewToMainView(venue.getShortUrl(), R.drawable.ic_web_24);
         }
     }
 
@@ -199,13 +213,15 @@ public class VenueDetailFragment extends BaseDialogFragment implements OnMapRead
     }
 
     @Override
-    public void onChanged(@Nullable VenueFoursquareEntity venueFoursquareEntity) {
+    public void onChanged(@Nullable final VenueFoursquareEntity venueFoursquareEntity) {
         if (venueFoursquareEntity.getBestPhoto() != null && venueFoursquareEntity.getBestPhoto().getImageUrl() != null) {
             ImageUtil.setImage(venueFoursquareEntity.getBestPhoto().getImageUrl(), new ImageUtil.ImageCallback() {
                 @Override
                 public void bitmapIsReady(Bitmap bitmap) {
                     photoImageView.setImageBitmap(bitmap);
                     appBarLayout.setExpanded(true);
+
+                    setNetData(VenueMapper.VenueForsquareToVenue(venueFoursquareEntity));
                 }
             });
         }
