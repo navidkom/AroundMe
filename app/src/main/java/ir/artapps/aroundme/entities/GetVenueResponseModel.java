@@ -1,23 +1,19 @@
-package ir.artapps.aroundme.data.entities;
+package ir.artapps.aroundme.entities;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import ir.artapps.aroundme.data.entities.Meta;
-import ir.artapps.aroundme.data.entities.Response;
-
-
 /**
- * Created by navid on 20,December,2018
+ * Created by navid on 27,December,2018
  */
-public class SearchVenuesesResponseModel {
+public class GetVenueResponseModel {
 
     @SerializedName("meta")
     @Expose
-    private Meta     meta;
+    private Meta      meta;
     @SerializedName("response")
     @Expose
-    private Response response;
+    private Response1 response;
 
     public Meta getMeta() {
         return meta;
@@ -27,12 +23,11 @@ public class SearchVenuesesResponseModel {
         this.meta = meta;
     }
 
-    public Response getResponse() {
+    public Response1 getResponse() {
         return response;
     }
 
-    public void setResponse(Response response) {
+    public void setResponse(Response1 response) {
         this.response = response;
     }
-
 }

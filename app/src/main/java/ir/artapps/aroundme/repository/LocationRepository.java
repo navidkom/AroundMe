@@ -1,6 +1,7 @@
-package ir.artapps.aroundme.util;
+package ir.artapps.aroundme.repository;
 
 import android.Manifest;
+import android.arch.lifecycle.LifecycleObserver;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -13,20 +14,24 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
-public class LocationUtil {
+import java.lang.ref.WeakReference;
 
-    private LocationCallback mLocationCallback;
+import ir.artapps.aroundme.util.DistanceUtil;
+
+public class LocationRepository  {
+
+    private LocationCallback            mLocationCallback;
     private FusedLocationProviderClient mFusedLocationClient;
-    private LocationRequest mLocationRequest;
-    private Location preLocation;
-    private Location lastLocation;
-    private Context context;
-    private double LOCATION_UPDATE_MIM_DISTANCE = 20;
+    private LocationRequest             mLocationRequest;
+    private Location                    preLocation;
+    private Location                    lastLocation;
+    private WeakReference<Context> context;
+    private double LOCATION_UPDATE_MIM_DISTANCE = 25;
 
-    public LocationUtil(final Context context, final MutableLiveData<Location> locationLiveData) {
+    public LocationRepository(final WeakReference<Context> context, final MutableLiveData<Location> locationLiveData) {
 
         this.context = context;
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context.get());
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
         mLocationRequest.setInterval(30000);
@@ -63,12 +68,13 @@ public class LocationUtil {
 
     public void startLocationUpdates() {
 
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(context.get(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context.get(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         mFusedLocationClient.requestLocationUpdates(mLocationRequest,
                 mLocationCallback,
                 null);
+
     }
 
     public void removeLocationListener() {

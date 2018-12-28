@@ -1,27 +1,25 @@
-package ir.artapps.aroundme.data.entities;
+package ir.artapps.aroundme.entities;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
-
 /**
  * Created by navid on 22,December,2018
  */
-public class Response {
+public class Response1 {
 
-    @SerializedName("venues")
+    @SerializedName("venue")
     @Expose
-    private List<VenueFoursquareEntity> venues = null;
+    private VenueFoursquareEntity venues = null;
     @SerializedName("confident")
     @Expose
     private Boolean confident;
 
-    public List<VenueFoursquareEntity> getVenues() {
+    public VenueFoursquareEntity getVenue() {
         return venues;
     }
 
-    public void setVenues(List<VenueFoursquareEntity> venues) {
+    public void setVenue(VenueFoursquareEntity venue) {
         this.venues = venues;
     }
 

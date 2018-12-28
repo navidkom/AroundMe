@@ -1,29 +1,44 @@
-package ir.artapps.aroundme.data.entities;
+package ir.artapps.aroundme.entities;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.Index;
-import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import static ir.artapps.aroundme.data.entities.Venue.TABLE_NAME;
+public class Venue implements Comparable<Venue>, Parcelable {
 
+    private double         distance   = 0;
+    private String         id;
+    private String         name;
+    private Location       location;
+    private double         latitude;
+    private double         longitude;
+    private String         icon;
+    private String         iconPrefix;
+    private String         canonicalUrl;
+    private Contact        contact;
+    private List<Category> categories = null;
+    private Boolean        verified;
+    private String         url;
+    private Boolean        dislike;
+    private Boolean        ok;
+    private Double         rating;
+    private String         ratingColor;
+    private Integer        ratingSignals;
+    private Integer        createdAt;
+    private String         shortUrl;
+    private String         timeZone;
+    private PhotoItem      bestPhoto;
 
-@Entity(tableName = TABLE_NAME, indices = {@Index(value = {"id"},
-        unique = true)})
-public class Venue implements Comparable<Venue>,Parcelable {
+    public PhotoItem getBestPhoto() {
+        return bestPhoto;
+    }
 
-    @Ignore
-    public static transient final String TABLE_NAME = "venue";
+    public void setBestPhoto(PhotoItem bestPhoto) {
+        this.bestPhoto = bestPhoto;
+    }
 
     public double getDistance() {
         return distance;
@@ -32,31 +47,6 @@ public class Venue implements Comparable<Venue>,Parcelable {
     public void setDistance(double distance) {
         this.distance = distance;
     }
-
-
-    @Ignore
-    private double distance = 0;
-
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "id_")
-    public transient long id_;
-
-
-    @SerializedName("id")
-    @Expose
-    private String id;
-
-    @SerializedName("name")
-    @Expose
-    private String name;
-
-    @SerializedName("location")
-    @Expose
-    private Location location;
-
-    @SerializedName("latitude")
-    @Expose
-    private double latitude;
 
     public double getLatitude() {
         return latitude;
@@ -74,14 +64,6 @@ public class Venue implements Comparable<Venue>,Parcelable {
         this.longitude = longitude;
     }
 
-    @SerializedName("longitude")
-    @Expose
-    private double longitude;
-
-    @SerializedName("icon")
-    @Expose
-    private String icon;
-
     public String getIcon() {
         return icon;
     }
@@ -97,62 +79,6 @@ public class Venue implements Comparable<Venue>,Parcelable {
     public void setIconPrefix(String iconPrefix) {
         this.iconPrefix = iconPrefix;
     }
-
-    @SerializedName("iconPrefix")
-    @Expose
-    private String iconPrefix;
-
-    @SerializedName("canonicalUrl")
-    @Expose
-    private String canonicalUrl;
-
-    @SerializedName("contact")
-    @Expose
-    private Contact contact;
-
-    @SerializedName("categories")
-    @Expose
-    private List<Category> categories = null;
-
-    @SerializedName("verified")
-    @Expose
-    private Boolean verified;
-
-    @SerializedName("url")
-    @Expose
-    private String url;
-
-    @SerializedName("dislike")
-    @Expose
-    private Boolean dislike;
-
-    @SerializedName("ok")
-    @Expose
-    private Boolean ok;
-
-    @SerializedName("rating")
-    @Expose
-    private Double rating;
-
-    @SerializedName("ratingColor")
-    @Expose
-    private String ratingColor;
-
-    @SerializedName("ratingSignals")
-    @Expose
-    private Integer ratingSignals;
-
-    @SerializedName("createdAt")
-    @Expose
-    private Integer createdAt;
-
-    @SerializedName("shortUrl")
-    @Expose
-    private String shortUrl;
-
-    @SerializedName("timeZone")
-    @Expose
-    private String timeZone;
 
     public String getId() {
 
@@ -285,7 +211,7 @@ public class Venue implements Comparable<Venue>,Parcelable {
 
     @Override
     public int compareTo(@NonNull Venue o) {
-        return Double.compare(distance , o.distance);
+        return Double.compare(distance, o.distance);
     }
 
 
@@ -306,7 +232,7 @@ public class Venue implements Comparable<Venue>,Parcelable {
         dest.writeString(this.iconPrefix);
         dest.writeString(this.canonicalUrl);
         dest.writeParcelable(this.contact, flags);
-        dest.writeList(this.categories);
+        dest.writeTypedList(this.categories);
         dest.writeValue(this.verified);
         dest.writeString(this.url);
         dest.writeValue(this.dislike);
@@ -317,6 +243,7 @@ public class Venue implements Comparable<Venue>,Parcelable {
         dest.writeValue(this.createdAt);
         dest.writeString(this.shortUrl);
         dest.writeString(this.timeZone);
+        dest.writeParcelable(this.bestPhoto, flags);
     }
 
     public Venue() {
@@ -333,8 +260,7 @@ public class Venue implements Comparable<Venue>,Parcelable {
         this.iconPrefix = in.readString();
         this.canonicalUrl = in.readString();
         this.contact = in.readParcelable(Contact.class.getClassLoader());
-        this.categories = new ArrayList<Category>();
-        in.readList(this.categories, Category.class.getClassLoader());
+        this.categories = in.createTypedArrayList(Category.CREATOR);
         this.verified = (Boolean) in.readValue(Boolean.class.getClassLoader());
         this.url = in.readString();
         this.dislike = (Boolean) in.readValue(Boolean.class.getClassLoader());
@@ -345,9 +271,10 @@ public class Venue implements Comparable<Venue>,Parcelable {
         this.createdAt = (Integer) in.readValue(Integer.class.getClassLoader());
         this.shortUrl = in.readString();
         this.timeZone = in.readString();
+        this.bestPhoto = in.readParcelable(PhotoItem.class.getClassLoader());
     }
 
-    public static final Parcelable.Creator<Venue> CREATOR = new Parcelable.Creator<Venue>() {
+    public static final Creator<Venue> CREATOR = new Creator<Venue>() {
         @Override
         public Venue createFromParcel(Parcel source) {
             return new Venue(source);

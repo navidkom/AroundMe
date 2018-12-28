@@ -10,7 +10,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import ir.artapps.aroundme.R;
-import ir.artapps.aroundme.data.entities.Venue;
+import ir.artapps.aroundme.entities.Venue;
 import ir.artapps.aroundme.util.DistanceUtil;
 import ir.artapps.aroundme.util.ImageUtil;
 
@@ -33,12 +33,7 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
 
     @Override
     public void onBindViewHolder(final VenueRecyclerViewViewHolder holder, int position) {
-
-        Venue model = items.get(position);
-        holder.name.setText(model.getName());
-        holder.distance.setText(DistanceUtil.distanceToString(model.getDistance()));
-        holder.imageView.setImageBitmap(null);
-        ImageUtil.setImage(model.getIcon(), holder.imageView);
+        holder.setView(position);
     }
 
     @Override
@@ -67,6 +62,14 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
             imageView = v.findViewById(R.id.venue_recycler_item_category_image_view);
 
             v.setOnClickListener(this);
+        }
+
+        public void setView(int position){
+            Venue model = items.get(position);
+            name.setText(model.getName());
+            distance.setText(DistanceUtil.distanceToString(model.getDistance()));
+            imageView.setImageBitmap(null);
+            ImageUtil.setImage(model.getIcon(), imageView);
         }
 
         @Override

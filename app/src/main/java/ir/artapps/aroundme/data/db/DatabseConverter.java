@@ -8,9 +8,9 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.List;
 
-import ir.artapps.aroundme.data.entities.Category;
-import ir.artapps.aroundme.data.entities.Contact;
-import ir.artapps.aroundme.data.entities.Location;
+import ir.artapps.aroundme.entities.Category;
+import ir.artapps.aroundme.entities.Contact;
+import ir.artapps.aroundme.entities.Location;
 
 
 public class DatabseConverter {

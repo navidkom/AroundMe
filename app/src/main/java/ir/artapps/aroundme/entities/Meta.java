@@ -1,4 +1,4 @@
-package ir.artapps.aroundme.data.entities;
+package ir.artapps.aroundme.entities;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

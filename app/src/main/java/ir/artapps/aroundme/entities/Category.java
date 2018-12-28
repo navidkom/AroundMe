@@ -1,4 +1,4 @@
-package ir.artapps.aroundme.data.entities;
+package ir.artapps.aroundme.entities;
 
 import android.os.Parcel;
 import android.os.Parcelable;

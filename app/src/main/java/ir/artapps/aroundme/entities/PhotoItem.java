@@ -1,4 +1,7 @@
-package ir.artapps.aroundme.data.entities;
+package ir.artapps.aroundme.entities;
+
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -6,7 +9,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Created by navid on 27,December,2018
  */
-public class PhotoItem {
+public class PhotoItem implements Parcelable {
     @SerializedName("id")
     @Expose
     private String  id;
@@ -99,4 +102,48 @@ public class PhotoItem {
     public String getImageUrl() {
         return String.format("%s%sx%s%s", prefix, width, height, suffix);
     }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.id);
+        dest.writeValue(this.createdAt);
+        dest.writeParcelable(this.source, flags);
+        dest.writeString(this.prefix);
+        dest.writeString(this.suffix);
+        dest.writeValue(this.width);
+        dest.writeValue(this.height);
+        dest.writeString(this.visibility);
+    }
+
+    public PhotoItem() {
+    }
+
+    protected PhotoItem(Parcel in) {
+        this.id = in.readString();
+        this.createdAt = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.source = in.readParcelable(Source.class.getClassLoader());
+        this.prefix = in.readString();
+        this.suffix = in.readString();
+        this.width = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.height = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.visibility = in.readString();
+    }
+
+    public static final Parcelable.Creator<PhotoItem> CREATOR = new Parcelable.Creator<PhotoItem>() {
+        @Override
+        public PhotoItem createFromParcel(Parcel source) {
+            return new PhotoItem(source);
+        }
+
+        @Override
+        public PhotoItem[] newArray(int size) {
+            return new PhotoItem[size];
+        }
+    };
 }

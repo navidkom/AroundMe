@@ -5,34 +5,39 @@ import android.arch.lifecycle.Observer;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.PersistableBundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.OnScrollListener;
 import android.view.View;
+import android.widget.Toast;
 
 import java.util.List;
 
 import ir.artapps.aroundme.R;
-import ir.artapps.aroundme.data.VenueManager;
-import ir.artapps.aroundme.data.entities.Venue;
-import ir.artapps.aroundme.util.GeneralUtils;
-import ir.artapps.aroundme.util.LocationUtil;
+import ir.artapps.aroundme.entities.Venue;
+import ir.artapps.aroundme.entities.VenuesPageEntity;
 import ir.artapps.aroundme.util.PermissionUtil;
 import ir.artapps.aroundme.view.adapter.MainRecyclerViewAdapter;
 import ir.artapps.aroundme.view.fragment.VenueDetailFragment;
+import ir.artapps.aroundme.viewmodel.VenueViewModel;
 
 /**
  * Created by navid on 22,December,2018
  */
-public class MainActivity extends AppCompatActivity implements Observer<List<Venue>>,MainRecyclerViewAdapter.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener {
-    
+public class MainActivity extends AppCompatActivity implements MainRecyclerViewAdapter.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener {
+
     private final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 105;
-    private LocationUtil locationUtil;
-    private RecyclerView recyclerView;
-    private List<Venue> venueList;
-    private SwipeRefreshLayout refreshLayout;
+    VenueViewModel venueViewModel = new VenueViewModel();
+    boolean        isLoading      = false;
+    boolean        isLastPage     = false;
+    private RecyclerView                 recyclerView;
+    private List<Venue>                  venueList;
+    private SwipeRefreshLayout           refreshLayout;
     private MutableLiveData<List<Venue>> venuesLiveData;
 
     @Override
@@ -41,25 +46,56 @@ public class MainActivity extends AppCompatActivity implements Observer<List<Ven
         setContentView(R.layout.main_activity);
 
         recyclerView = findViewById(R.id.activity_main_recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.addOnScrollListener(new OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                int visibleItemCount = linearLayoutManager.getChildCount();
+                int totalItemCount = linearLayoutManager.getItemCount();
+                int pastVisibleItems = linearLayoutManager.findFirstVisibleItemPosition();
+
+                if (visibleItemCount + pastVisibleItems >= totalItemCount && !isLoading && !isLastPage) {
+                    venueViewModel.getVenuesNextPage(getApplication(), MainActivity.this);
+                    isLoading = true;
+                }
+            }
+        });
 
         refreshLayout = findViewById(R.id.activity_main_refresh_layout);
         refreshLayout.setOnRefreshListener(this);
         refreshLayout.setRefreshing(true);
         refreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorPrimary));
 
-        venuesLiveData = new MutableLiveData<>();
-        venuesLiveData.observe(this, this);
-
-        final MutableLiveData<Location> locationLiveData = new MutableLiveData<>();
-        locationLiveData.observe(this, new Observer<Location>() {
+        venueViewModel.getLocationLiveData().observe(this, new Observer<Location>() {
             @Override
             public void onChanged(@Nullable Location location) {
                 getData(location);
             }
         });
 
-        locationUtil = new LocationUtil(this, locationLiveData);
+        venueViewModel.getVenuesLiveData().observe(this, new Observer<VenuesPageEntity>() {
+            @Override
+            public void onChanged(@Nullable VenuesPageEntity venuesPageEntity) {
+                List<Venue> venues = venuesPageEntity.getVenues();
+
+                if (isLoading) {
+                    isLoading = false;
+                }
+
+                if (venuesPageEntity.getPage() == 0) {
+                    updateRecyclerView(venues);
+                } else if (venuesPageEntity.getPage() == venueViewModel.getPage() + 1) {
+                    addToRecyclerView(venues);
+                }
+                venueViewModel.setPage(venuesPageEntity.getPage());
+                isLastPage = venuesPageEntity.isEndOfList();
+            }
+        });
+
+        venueViewModel.initLocationRepository(this);
     }
 
     protected void onResume() {
@@ -76,11 +112,11 @@ public class MainActivity extends AppCompatActivity implements Observer<List<Ven
     @Override
     protected void onStop() {
         super.onStop();
-        locationUtil.removeLocationListener();
+        venueViewModel.removeLocationListener();
     }
 
     private void startLocationUpdates() {
-        locationUtil.startLocationUpdates();
+        venueViewModel.startLocationUpdates();
     }
 
     @Override
@@ -96,24 +132,22 @@ public class MainActivity extends AppCompatActivity implements Observer<List<Ven
         }
     }
 
-    private void getData(Location location){
-        VenueManager.getInstance().getVenuesAroundMe(getApplication(),
-                location.getLatitude(), location.getLongitude(),
-                GeneralUtils.isNetworkAvailable(MainActivity.this),
-                false, venuesLiveData);
+    private void getData(Location location) {
+        venueViewModel.getVenuesFirstPage(getApplication(), this, location);
     }
 
-    @Override
-    public void onChanged(@Nullable List<Venue> venues) {
+    private void updateRecyclerView(List<Venue> venues) {
         venueList = venues;
-        if (recyclerView.getAdapter() != null) {
-            recyclerView.getAdapter().notifyDataSetChanged();
-        } else {
-            MainRecyclerViewAdapter adapter = new MainRecyclerViewAdapter(venueList);
-            adapter.setOnItemClickListener(this);
-            recyclerView.setAdapter(adapter);
-        }
+        MainRecyclerViewAdapter adapter = new MainRecyclerViewAdapter(venueList);
+        adapter.setOnItemClickListener(this);
+        recyclerView.setAdapter(adapter);
         refreshLayout.setRefreshing(false);
+    }
+
+    private void addToRecyclerView(List<Venue> venues) {
+        int firstPos = venueList.size();
+        venueList.addAll(venues);
+        recyclerView.getAdapter().notifyItemRangeInserted(firstPos, venues.size());
     }
 
     @Override
@@ -124,9 +158,15 @@ public class MainActivity extends AppCompatActivity implements Observer<List<Ven
 
     @Override
     public void onRefresh() {
-        Location location = locationUtil.getLastLocation();
-        if(location != null ) {
+        Location location = venueViewModel.getLastLocation();
+        if (location != null) {
+            isLastPage = false;
             getData(location);
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
     }
 }

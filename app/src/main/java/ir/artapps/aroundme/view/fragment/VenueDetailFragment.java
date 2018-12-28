@@ -1,7 +1,6 @@
 package ir.artapps.aroundme.view.fragment;
 
 import android.Manifest;
-import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -25,27 +24,26 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import ir.artapps.aroundme.R;
-import ir.artapps.aroundme.data.VenueManager;
-import ir.artapps.aroundme.data.entities.Category;
-import ir.artapps.aroundme.data.entities.Venue;
-import ir.artapps.aroundme.data.entities.VenueFoursquareEntity;
-import ir.artapps.aroundme.data.mapper.VenueMapper;
+import ir.artapps.aroundme.entities.Category;
+import ir.artapps.aroundme.entities.Venue;
 import ir.artapps.aroundme.util.ImageUtil;
 import ir.artapps.aroundme.view.customview.VenueDetailCustomView;
+import ir.artapps.aroundme.viewmodel.VenueDetailViewModel;
 
 /**
  * Created by navid on 28,December,2018
  */
-public class VenueDetailFragment extends BaseDialogFragment implements OnMapReadyCallback, Observer<VenueFoursquareEntity> {
+public class VenueDetailFragment extends BaseDialogFragment implements OnMapReadyCallback {
 
     private static final String VENUE_MODEL_ARG_KEY = "venueModelKey";
 
-    private final float                   MAP_ZOOM_LEVEL = 14.0f;
+    private final float                   MAP_ZOOM_LEVEL       = 14.0f;
     private       Venue                   venue;
     private       ImageView               photoImageView;
     private       ViewGroup               linearLayout;
     private       AppBarLayout            appBarLayout;
     private       CollapsingToolbarLayout collapsingToolbarLayout;
+    private       VenueDetailViewModel    venueDetailViewModel = new VenueDetailViewModel();
 
 
     public static VenueDetailFragment newInstance(Venue venue) {
@@ -83,10 +81,15 @@ public class VenueDetailFragment extends BaseDialogFragment implements OnMapRead
         SupportMapFragment mapFragment = (SupportMapFragment) getFragmentManager().findFragmentById(R.id.fragment_venue_detail_map_fragment);
         mapFragment.getMapAsync(this);
 
-        MutableLiveData<VenueFoursquareEntity> mutableLiveData = new MutableLiveData<>();
-        mutableLiveData.observe(this, this);
+        venueDetailViewModel.getVenueLiveData().observe(this, new Observer<Venue>() {
+            @Override
+            public void onChanged(@Nullable Venue venue) {
+                setNetData(venue);
+            }
+        });
 
-        VenueManager.getInstance().getVenueDetail(venue.getId(), mutableLiveData);
+        venueDetailViewModel.getVenue(venue.getId());
+
     }
 
     @Override
@@ -183,15 +186,23 @@ public class VenueDetailFragment extends BaseDialogFragment implements OnMapRead
                 addViewToMainView(addressBuilder.toString(), R.drawable.ic_location_24);
             }
         }
-
     }
 
-    private void setNetData(Venue venue) {
+    private void addViewToMainView(String text, int drawableResource) {
+        linearLayout.addView(new VenueDetailCustomView(getContext(), text, getResources().getDrawable(drawableResource)));
+    }
 
-        final String ltrChar = "\u200e";
-        final String nlChar = "\n";
-        final String virChar = ", ";
+    private void setNetData(final Venue venue) {
 
+        if (venue.getBestPhoto() != null && venue.getBestPhoto().getImageUrl() != null) {
+            ImageUtil.setImage(venue.getBestPhoto().getImageUrl(), new ImageUtil.ImageCallback() {
+                @Override
+                public void bitmapIsReady(Bitmap bitmap) {
+                    photoImageView.setImageBitmap(bitmap);
+                    appBarLayout.setExpanded(true);
+                }
+            });
+        }
 
         if (venue.getContact() != null) {
             if (venue.getContact().getFormattedPhone() != null) {
@@ -208,24 +219,6 @@ public class VenueDetailFragment extends BaseDialogFragment implements OnMapRead
         }
     }
 
-    private void addViewToMainView(String text, int drawableResource) {
-        linearLayout.addView(new VenueDetailCustomView(getContext(), text, getResources().getDrawable(drawableResource)));
-    }
-
-    @Override
-    public void onChanged(@Nullable final VenueFoursquareEntity venueFoursquareEntity) {
-        if (venueFoursquareEntity.getBestPhoto() != null && venueFoursquareEntity.getBestPhoto().getImageUrl() != null) {
-            ImageUtil.setImage(venueFoursquareEntity.getBestPhoto().getImageUrl(), new ImageUtil.ImageCallback() {
-                @Override
-                public void bitmapIsReady(Bitmap bitmap) {
-                    photoImageView.setImageBitmap(bitmap);
-                    appBarLayout.setExpanded(true);
-
-                    setNetData(VenueMapper.VenueForsquareToVenue(venueFoursquareEntity));
-                }
-            });
-        }
-    }
 
     private boolean checkMapPermission() {
         return !((ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)

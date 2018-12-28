@@ -10,10 +10,10 @@ import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 
-import ir.artapps.aroundme.data.entities.Venue;
+import ir.artapps.aroundme.entities.VenueRoomEntity;
 
 @TypeConverters(DatabseConverter.class)
-@Database(entities = {Venue.class}, version = 1)
+@Database(entities = {VenueRoomEntity.class}, version = 1)
 abstract class AppDatabase extends RoomDatabase{
     abstract VenuesDAO getVenuesDAO();
 

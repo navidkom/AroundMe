@@ -1,88 +1,122 @@
+package ir.artapps.aroundme.entities;
 
-package ir.artapps.aroundme.data.entities;
-
-import java.util.List;
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.Index;
+import android.arch.persistence.room.PrimaryKey;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
 
-public class VenueFoursquareEntity {
+import static ir.artapps.aroundme.entities.VenueRoomEntity.TABLE_NAME;
+
+
+@Entity(tableName = TABLE_NAME, indices = {@Index(value = {"id"},
+        unique = true)})
+public class VenueRoomEntity {
+
+    @Ignore
+    public static transient final String TABLE_NAME = "venue";
+
+
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id_")
+    public transient long id_;
 
     @SerializedName("id")
     @Expose
-    private String     id;
-
+    private String id;
     @SerializedName("name")
     @Expose
-    private String     name;
-
+    private String name;
     @SerializedName("location")
     @Expose
-    private Location   location;
-
+    private Location location;
+    @SerializedName("latitude")
+    @Expose
+    private double latitude;
+    @SerializedName("longitude")
+    @Expose
+    private double longitude;
+    @SerializedName("icon")
+    @Expose
+    private String icon;
+    @SerializedName("iconPrefix")
+    @Expose
+    private String iconPrefix;
     @SerializedName("canonicalUrl")
     @Expose
-    private String     canonicalUrl;
-
+    private String canonicalUrl;
     @SerializedName("contact")
     @Expose
     private Contact contact;
-
     @SerializedName("categories")
     @Expose
     private List<Category> categories = null;
-
     @SerializedName("verified")
     @Expose
     private Boolean verified;
-
     @SerializedName("url")
     @Expose
     private String url;
-
     @SerializedName("dislike")
     @Expose
     private Boolean dislike;
-
     @SerializedName("ok")
     @Expose
     private Boolean ok;
-
     @SerializedName("rating")
     @Expose
     private Double rating;
-
     @SerializedName("ratingColor")
     @Expose
     private String ratingColor;
-
     @SerializedName("ratingSignals")
     @Expose
     private Integer ratingSignals;
-
     @SerializedName("createdAt")
     @Expose
     private Integer createdAt;
-
     @SerializedName("shortUrl")
     @Expose
     private String shortUrl;
-
     @SerializedName("timeZone")
     @Expose
     private String timeZone;
 
-    @SerializedName("bestPhoto")
-    @Expose
-    private PhotoItem bestPhoto;
-
-    public PhotoItem getBestPhoto() {
-        return bestPhoto;
+    public double getLatitude() {
+        return latitude;
     }
 
-    public void setBestPhoto(PhotoItem bestPhoto) {
-        this.bestPhoto = bestPhoto;
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public String getIconPrefix() {
+        return iconPrefix;
+    }
+
+    public void setIconPrefix(String iconPrefix) {
+        this.iconPrefix = iconPrefix;
     }
 
     public String getId() {
@@ -213,6 +247,5 @@ public class VenueFoursquareEntity {
     public void setTimeZone(String timeZone) {
         this.timeZone = timeZone;
     }
-
 
 }
