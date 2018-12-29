@@ -1,7 +1,7 @@
 package ir.artapps.aroundme.view.activity;
 
-import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -14,7 +14,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
 import android.view.View;
-import android.widget.Toast;
 
 import java.util.List;
 
@@ -32,18 +31,20 @@ import ir.artapps.aroundme.viewmodel.VenueViewModel;
 public class MainActivity extends AppCompatActivity implements MainRecyclerViewAdapter.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     private final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 105;
-    VenueViewModel venueViewModel = new VenueViewModel();
-    boolean        isLoading      = false;
-    boolean        isLastPage     = false;
-    private RecyclerView                 recyclerView;
-    private List<Venue>                  venueList;
-    private SwipeRefreshLayout           refreshLayout;
-    private MutableLiveData<List<Venue>> venuesLiveData;
+    private VenueViewModel venueViewModel;
+    private RecyclerView recyclerView;
+    private SwipeRefreshLayout refreshLayout;
+    private MainRecyclerViewAdapter adapter;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
+
+        venueViewModel = ViewModelProviders.of(this).get(VenueViewModel.class);
+
+        adapter = new MainRecyclerViewAdapter(venueViewModel.getVenueList());
 
         recyclerView = findViewById(R.id.activity_main_recycler_view);
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -57,9 +58,9 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                 int totalItemCount = linearLayoutManager.getItemCount();
                 int pastVisibleItems = linearLayoutManager.findFirstVisibleItemPosition();
 
-                if (visibleItemCount + pastVisibleItems >= totalItemCount && !isLoading && !isLastPage) {
+                if (visibleItemCount + pastVisibleItems >= totalItemCount && !venueViewModel.isLoading() && !venueViewModel.isLastPage()) {
                     venueViewModel.getVenuesNextPage(getApplication(), MainActivity.this);
-                    isLoading = true;
+                    venueViewModel.setLoading(true);
                 }
             }
         });
@@ -81,8 +82,8 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
             public void onChanged(@Nullable VenuesPageEntity venuesPageEntity) {
                 List<Venue> venues = venuesPageEntity.getVenues();
 
-                if (isLoading) {
-                    isLoading = false;
+                if (venueViewModel.isLoading()) {
+                    venueViewModel.setLoading(false);
                 }
 
                 if (venuesPageEntity.getPage() == 0) {
@@ -91,11 +92,11 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                     addToRecyclerView(venues);
                 }
                 venueViewModel.setPage(venuesPageEntity.getPage());
-                isLastPage = venuesPageEntity.isEndOfList();
+                venueViewModel.setLastPage(venuesPageEntity.isEndOfList());
             }
         });
 
-        venueViewModel.initLocationRepository(this);
+        venueViewModel.initLocationRepository(this, this);
     }
 
     protected void onResume() {
@@ -104,19 +105,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         if (!PermissionUtil.isLocationPermissionAllow(this)) {
             PermissionUtil.showLocationPermissionDialog(this, MY_PERMISSIONS_REQUEST_READ_CONTACTS);
             return;
-        } else {
-            startLocationUpdates();
         }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        venueViewModel.removeLocationListener();
-    }
-
-    private void startLocationUpdates() {
-        venueViewModel.startLocationUpdates();
     }
 
     @Override
@@ -125,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
             case MY_PERMISSIONS_REQUEST_READ_CONTACTS: {
 
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    startLocationUpdates();
+                    venueViewModel.startLocationUpdates();
                 }
                 return;
             }
@@ -137,22 +126,22 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     }
 
     private void updateRecyclerView(List<Venue> venues) {
-        venueList = venues;
-        MainRecyclerViewAdapter adapter = new MainRecyclerViewAdapter(venueList);
+        venueViewModel.setVenueList(venues);
+        adapter = new MainRecyclerViewAdapter(venueViewModel.getVenueList());
         adapter.setOnItemClickListener(this);
         recyclerView.setAdapter(adapter);
         refreshLayout.setRefreshing(false);
     }
 
     private void addToRecyclerView(List<Venue> venues) {
-        int firstPos = venueList.size();
-        venueList.addAll(venues);
-        recyclerView.getAdapter().notifyItemRangeInserted(firstPos, venues.size());
+        int firstPos = venueViewModel.getVenueList().size();
+        venueViewModel.getVenueList().addAll(venues);
+        adapter.notifyItemRangeInserted(firstPos, venues.size());
     }
 
     @Override
     public void onItemClick(View view, int position) {
-        VenueDetailFragment detailFragment = VenueDetailFragment.newInstance(venueList.get(position));
+        VenueDetailFragment detailFragment = VenueDetailFragment.newInstance(venueViewModel.getVenueList().get(position));
         detailFragment.show(getSupportFragmentManager(), position + "");
     }
 
@@ -160,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     public void onRefresh() {
         Location location = venueViewModel.getLastLocation();
         if (location != null) {
-            isLastPage = false;
+            venueViewModel.setLastPage(false);
             getData(location);
         }
     }

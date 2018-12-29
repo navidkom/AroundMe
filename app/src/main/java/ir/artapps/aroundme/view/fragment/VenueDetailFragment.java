@@ -2,6 +2,7 @@ package ir.artapps.aroundme.view.fragment;
 
 import android.Manifest;
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -29,6 +30,7 @@ import ir.artapps.aroundme.entities.Venue;
 import ir.artapps.aroundme.util.ImageUtil;
 import ir.artapps.aroundme.view.customview.VenueDetailCustomView;
 import ir.artapps.aroundme.viewmodel.VenueDetailViewModel;
+import ir.artapps.aroundme.viewmodel.VenueViewModel;
 
 /**
  * Created by navid on 28,December,2018
@@ -43,8 +45,7 @@ public class VenueDetailFragment extends BaseDialogFragment implements OnMapRead
     private       ViewGroup               linearLayout;
     private       AppBarLayout            appBarLayout;
     private       CollapsingToolbarLayout collapsingToolbarLayout;
-    private       VenueDetailViewModel    venueDetailViewModel = new VenueDetailViewModel();
-
+    private       VenueDetailViewModel    venueDetailViewModel;
 
     public static VenueDetailFragment newInstance(Venue venue) {
         VenueDetailFragment venueDetailFragment = new VenueDetailFragment();
@@ -52,11 +53,13 @@ public class VenueDetailFragment extends BaseDialogFragment implements OnMapRead
         bundle.putParcelable(VENUE_MODEL_ARG_KEY, venue);
         venueDetailFragment.setArguments(bundle);
         return venueDetailFragment;
+
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        venueDetailViewModel =  ViewModelProviders.of(this).get(VenueDetailViewModel.class);
     }
 
     @Nullable

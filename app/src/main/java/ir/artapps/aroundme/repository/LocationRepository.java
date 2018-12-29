@@ -1,8 +1,10 @@
 package ir.artapps.aroundme.repository;
 
 import android.Manifest;
+import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.LifecycleObserver;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.OnLifecycleEvent;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -14,24 +16,22 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
-import java.lang.ref.WeakReference;
-
 import ir.artapps.aroundme.util.DistanceUtil;
 
-public class LocationRepository  {
+public class LocationRepository implements LifecycleObserver {
 
-    private LocationCallback            mLocationCallback;
+    private LocationCallback mLocationCallback;
     private FusedLocationProviderClient mFusedLocationClient;
-    private LocationRequest             mLocationRequest;
-    private Location                    preLocation;
-    private Location                    lastLocation;
-    private WeakReference<Context> context;
+    private LocationRequest mLocationRequest;
+    private static Location preLocation;
+    private static Location lastLocation;
+    private Context context;
     private double LOCATION_UPDATE_MIM_DISTANCE = 25;
 
-    public LocationRepository(final WeakReference<Context> context, final MutableLiveData<Location> locationLiveData) {
+    public LocationRepository(final Context context, final MutableLiveData<Location> locationLiveData) {
 
         this.context = context;
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context.get());
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
         mLocationRequest.setInterval(30000);
@@ -61,23 +61,29 @@ public class LocationRepository  {
         };
     }
 
-    public Location getLastLocation(){
+    public Location getLastLocation() {
         preLocation = lastLocation;
         return lastLocation;
     }
 
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     public void startLocationUpdates() {
 
-        if (ActivityCompat.checkSelfPermission(context.get(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context.get(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (context == null) {
+            return;
+        }
+
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         mFusedLocationClient.requestLocationUpdates(mLocationRequest,
                 mLocationCallback,
                 null);
-
     }
 
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     public void removeLocationListener() {
         mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+        context = null;
     }
 }
