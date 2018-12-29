@@ -7,8 +7,10 @@ import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.location.Location;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import ir.artapps.aroundme.SingleLiveEvent;
 import ir.artapps.aroundme.entities.Venue;
 import ir.artapps.aroundme.entities.VenuesPageEntity;
 import ir.artapps.aroundme.repository.LocationRepository;
@@ -20,13 +22,13 @@ import ir.artapps.aroundme.util.GeneralUtils;
  */
 public class VenueViewModel extends ViewModel {
 
-    private final MutableLiveData<Location> locationLiveData = new MutableLiveData<>();
-    private final MutableLiveData<VenuesPageEntity> venuesLiveData = new MutableLiveData<>();
+    private final SingleLiveEvent<Location> locationLiveData = new SingleLiveEvent<>();
+    private final SingleLiveEvent<VenuesPageEntity> venuesLiveData = new SingleLiveEvent<>();
     private final VenueRepository venueRepository = new VenueRepository();
     private int page = 0;
     private Location location;
     private LocationRepository locationRepository;
-    private List<Venue> venueList;
+    private List<Venue> venueList = new ArrayList<>();
     boolean isLoading = false;
     boolean isLastPage = false;
 

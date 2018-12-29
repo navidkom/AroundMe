@@ -21,8 +21,9 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
     private List<Venue>         items;
     private OnItemClickListener mItemClickListener;
 
-    public MainRecyclerViewAdapter(List<Venue> items) {
+    public MainRecyclerViewAdapter(List<Venue> items, final OnItemClickListener mItemClickListener) {
         this.items = items;
+        this.mItemClickListener = mItemClickListener;
     }
 
     @Override
@@ -39,10 +40,6 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
     @Override
     public int getItemCount() {
         return items.size();
-    }
-
-    public void setOnItemClickListener(final OnItemClickListener mItemClickListener) {
-        this.mItemClickListener = mItemClickListener;
     }
 
     public interface OnItemClickListener {

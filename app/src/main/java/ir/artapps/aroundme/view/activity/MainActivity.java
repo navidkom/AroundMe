@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -35,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     private RecyclerView recyclerView;
     private SwipeRefreshLayout refreshLayout;
     private MainRecyclerViewAdapter adapter;
-
+    LinearLayoutManager linearLayoutManager = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,11 +43,13 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
 
         venueViewModel = ViewModelProviders.of(this).get(VenueViewModel.class);
 
-        adapter = new MainRecyclerViewAdapter(venueViewModel.getVenueList());
-
+        adapter = new MainRecyclerViewAdapter(venueViewModel.getVenueList(), this);
         recyclerView = findViewById(R.id.activity_main_recycler_view);
-        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setAdapter(adapter);
+
+
         recyclerView.addOnScrollListener(new OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
@@ -67,12 +68,12 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
 
         refreshLayout = findViewById(R.id.activity_main_refresh_layout);
         refreshLayout.setOnRefreshListener(this);
-        refreshLayout.setRefreshing(true);
         refreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorPrimary));
 
         venueViewModel.getLocationLiveData().observe(this, new Observer<Location>() {
             @Override
             public void onChanged(@Nullable Location location) {
+                refreshLayout.setRefreshing(true);
                 getData(location);
             }
         });
@@ -127,8 +128,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
 
     private void updateRecyclerView(List<Venue> venues) {
         venueViewModel.setVenueList(venues);
-        adapter = new MainRecyclerViewAdapter(venueViewModel.getVenueList());
-        adapter.setOnItemClickListener(this);
+        adapter = new MainRecyclerViewAdapter(venueViewModel.getVenueList(), this);
         recyclerView.setAdapter(adapter);
         refreshLayout.setRefreshing(false);
     }
@@ -152,10 +152,5 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
             venueViewModel.setLastPage(false);
             getData(location);
         }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState, outPersistentState);
     }
 }
